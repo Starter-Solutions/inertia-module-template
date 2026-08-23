@@ -233,8 +233,8 @@ deleteDirectory($exampleDirectory);
 $exampleDocumentation = $includeExample ? <<<'MARKDOWN'
 ## Example
 
-The generated example includes a model, migration, seeder, controller, routes,
-and Inertia index and show pages.
+The generated example includes a model, migration, seeder, controller, resource
+routes, and Inertia pages for listing, viewing, creating, and editing records.
 
 Run the migration and seed the example records in the consuming application:
 

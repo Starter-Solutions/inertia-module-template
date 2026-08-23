@@ -14,5 +14,6 @@ Route::middleware('web')
     ->prefix($routePrefix)
     ->name('{{MODULE_SLUG}}.')
     ->group(function (): void {
-        Route::resource('examples', ExampleController::class)->only(['index', 'show']);
+        Route::resource('examples', ExampleController::class)
+            ->only(['index', 'create', 'store', 'show', 'edit', 'update']);
     });

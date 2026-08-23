@@ -11,6 +11,10 @@ defineProps({
         type: String,
         required: true,
     },
+    editUrl: {
+        type: String,
+        required: true,
+    },
 })
 </script>
 
@@ -25,6 +29,9 @@ defineProps({
             <Link :href="indexUrl" class="inertia-module-button">
                 <span aria-hidden="true">←</span>
                 All examples
+            </Link>
+            <Link :href="editUrl" class="inertia-module-button inertia-module-button-primary">
+                Edit example
             </Link>
         </template>
 

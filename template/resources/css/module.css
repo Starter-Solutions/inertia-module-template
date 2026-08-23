@@ -1,6 +1,7 @@
 :root {
     --inertia-module-accent: #4f46e5;
     --inertia-module-accent-strong: #3730a3;
+    --inertia-module-accent-contrast: #ffffff;
     --inertia-module-accent-soft: #eef2ff;
     --inertia-module-background: #f6f7fb;
     --inertia-module-surface: #ffffff;
@@ -213,6 +214,68 @@
     transform: translateY(-1px);
 }
 
+.inertia-module-button-primary {
+    border-color: var(--inertia-module-accent);
+    color: var(--inertia-module-accent-contrast);
+    background: var(--inertia-module-accent);
+}
+
+.inertia-module-button-primary:hover {
+    color: var(--inertia-module-accent-contrast);
+    background: var(--inertia-module-accent-strong);
+}
+
+.inertia-module-button:disabled {
+    cursor: wait;
+    opacity: 0.65;
+    transform: none;
+}
+
+.inertia-module-form {
+    display: grid;
+    gap: 1.5rem;
+    padding: clamp(1.5rem, 5vw, 3rem);
+}
+
+.inertia-module-field {
+    display: grid;
+    gap: 0.55rem;
+    font-size: 0.9rem;
+    font-weight: 650;
+}
+
+.inertia-module-field input,
+.inertia-module-field textarea {
+    width: 100%;
+    border: 1px solid var(--inertia-module-border);
+    border-radius: 0.75rem;
+    padding: 0.8rem 0.9rem;
+    color: var(--inertia-module-text);
+    background: var(--inertia-module-surface);
+    font: inherit;
+    font-weight: 400;
+}
+
+.inertia-module-field textarea {
+    resize: vertical;
+}
+
+.inertia-module-field input:focus,
+.inertia-module-field textarea:focus {
+    border-color: var(--inertia-module-accent);
+    outline: 3px solid rgb(79 70 229 / 18%);
+}
+
+.inertia-module-error {
+    color: #dc2626;
+    font-weight: 500;
+}
+
+.inertia-module-form-actions {
+    display: flex;
+    justify-content: flex-end;
+}
+
 .inertia-module-footer {
     margin-top: 1.25rem;
     color: var(--inertia-module-muted);
@@ -243,6 +306,7 @@
     :root {
         --inertia-module-accent: #a5b4fc;
         --inertia-module-accent-strong: #c7d2fe;
+        --inertia-module-accent-contrast: #182230;
         --inertia-module-accent-soft: #24243f;
         --inertia-module-background: #101218;
         --inertia-module-surface: #181b23;

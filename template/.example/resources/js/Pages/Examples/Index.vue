@@ -7,6 +7,10 @@ defineProps({
         type: Array,
         required: true,
     },
+    createUrl: {
+        type: String,
+        required: true,
+    },
 })
 </script>
 
@@ -17,6 +21,12 @@ defineProps({
         title="Examples"
         description="A small end-to-end example loaded directly from the module package."
     >
+        <template #actions>
+            <Link :href="createUrl" class="inertia-module-button inertia-module-button-primary">
+                New example
+            </Link>
+        </template>
+
         <div v-if="examples.length === 0" class="inertia-module-empty">
             <div class="inertia-module-empty-mark" aria-hidden="true">◇</div>
             <h2>No example records yet</h2>

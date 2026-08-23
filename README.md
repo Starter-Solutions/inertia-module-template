@@ -52,7 +52,8 @@ php create-module -o starter-solutions --example customer-management
 ```
 
 The example adds an Eloquent model, migration, idempotent seeder, controller,
-web routes, and Vue index and show pages. The generated module README contains
+resource routes, and Vue pages for listing, viewing, creating, and editing records.
+The generated module README contains
 the commands required to publish the pages, migrate and seed the database, and
 open the example in the consuming application.
 
