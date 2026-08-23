@@ -1,0 +1,78 @@
+name: Publish npm package
+
+on:
+    push:
+        branches:
+            - main
+        paths:
+            - npm/inertia-modules/**
+            - .github/workflows/publish-npm-package.yml
+    pull_request:
+        paths:
+            - npm/inertia-modules/**
+            - .github/workflows/publish-npm-package.yml
+    workflow_dispatch:
+
+concurrency:
+    group: publish-inertia-modules-${{ github.ref }}
+    cancel-in-progress: false
+
+permissions:
+    contents: read
+    id-token: write
+
+jobs:
+    test-and-publish:
+        name: Test and publish
+        runs-on: ubuntu-latest
+        defaults:
+            run:
+                working-directory: npm/inertia-modules
+
+        steps:
+            - name: Check out repository
+              uses: actions/checkout@v6
+
+            - name: Set up Node.js
+              uses: actions/setup-node@v6
+              with:
+                  node-version: 24.x
+                  registry-url: https://registry.npmjs.org
+                  package-manager-cache: false
+
+            - name: Install dependencies
+              run: npm ci
+
+            - name: Run tests
+              run: npm test
+
+            - name: Validate package contents
+              run: npm pack --dry-run
+
+            - name: Check whether version exists
+              id: version
+              shell: bash
+              run: |
+                  package_name=$(node --print "require('./package.json').name")
+                  package_version=$(node --print "require('./package.json').version")
+
+                  echo "name=$package_name" >> "$GITHUB_OUTPUT"
+                  echo "version=$package_version" >> "$GITHUB_OUTPUT"
+
+                  if npm view "$package_name@$package_version" version --json > /dev/null 2>&1; then
+                      echo "exists=true" >> "$GITHUB_OUTPUT"
+                      echo "$package_name@$package_version is already published."
+                  else
+                      echo "exists=false" >> "$GITHUB_OUTPUT"
+                      echo "$package_name@$package_version will be published."
+                  fi
+
+            - name: Publish package
+              if: github.event_name != 'pull_request' && steps.version.outputs.exists == 'false'
+              run: npm publish --access public --provenance
+              env:
+                  NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+
+            - name: Report existing version
+              if: steps.version.outputs.exists == 'true'
+              run: echo "${{ steps.version.outputs.name }}@${{ steps.version.outputs.version }} is already available on npm."
