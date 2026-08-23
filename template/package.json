@@ -1,0 +1,6 @@
+{
+    "name": "@{{ORGANIZATION_SLUG}}/{{MODULE_SLUG}}",
+    "version": "0.1.0",
+    "private": true,
+    "description": "Frontend resources for the {{MODULE_TITLE}} module"
+}

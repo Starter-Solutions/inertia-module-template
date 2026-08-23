@@ -1,0 +1,275 @@
+#!/usr/bin/env php
+<?php
+
+declare(strict_types=1);
+
+const TEMPLATE_DIRECTORY = __DIR__.'/template';
+
+function fail(string $message, int $exitCode = 1): never
+{
+    fwrite(STDERR, "\033[31mError:\033[0m {$message}\n");
+    exit($exitCode);
+}
+
+function info(string $message): void
+{
+    fwrite(STDOUT, "\033[32m✓\033[0m {$message}\n");
+}
+
+/** @return array{name: string, slug: string, snake: string, title: string} */
+function normalizeName(string $input, string $label): array
+{
+    if (! preg_match('/^[a-zA-Z][a-zA-Z0-9 _-]*$/', $input)) {
+        fail("The {$label} must start with a letter and may only contain letters, numbers, spaces, hyphens, and underscores.");
+    }
+
+    $words = preg_split('/(?<=[a-z0-9])(?=[A-Z])|[\s_-]+/', $input, -1, PREG_SPLIT_NO_EMPTY);
+
+    if ($words === false || $words === []) {
+        fail("Unable to normalize the {$label}.");
+    }
+
+    $words = array_map(static fn (string $word): string => strtolower($word), $words);
+
+    return [
+        'name' => implode('', array_map(static fn (string $word): string => ucfirst($word), $words)),
+        'slug' => implode('-', $words),
+        'snake' => implode('_', $words),
+        'title' => implode(' ', array_map(static fn (string $word): string => ucfirst($word), $words)),
+    ];
+}
+
+function deleteDirectory(string $directory): void
+{
+    $items = new FilesystemIterator($directory, FilesystemIterator::SKIP_DOTS);
+
+    foreach ($items as $item) {
+        if ($item->isDir()) {
+            deleteDirectory($item->getPathname());
+            continue;
+        }
+
+        if (! unlink($item->getPathname())) {
+            fail("Unable to remove temporary example file: {$item->getPathname()}");
+        }
+    }
+
+    if (! rmdir($directory)) {
+        fail("Unable to remove temporary example directory: {$directory}");
+    }
+}
+
+function copyTemplate(string $source, string $target): void
+{
+    if (! is_dir($target) && ! mkdir($target, 0755, true)) {
+        fail("Unable to create target directory: {$target}");
+    }
+
+    $items = new FilesystemIterator($source, FilesystemIterator::SKIP_DOTS);
+
+    foreach ($items as $item) {
+        $destination = $target.DIRECTORY_SEPARATOR.$item->getFilename();
+
+        if ($item->isDir()) {
+            copyTemplate($item->getPathname(), $destination);
+            continue;
+        }
+
+        if (! copy($item->getPathname(), $destination)) {
+            fail("Unable to copy template file: {$item->getPathname()}");
+        }
+
+        chmod($destination, $item->getPerms() & 0777);
+    }
+}
+
+/** @param array<string, string> $replacements */
+function replacePlaceholders(string $target, array $replacements): void
+{
+    $iterator = new RecursiveIteratorIterator(
+        new RecursiveDirectoryIterator($target, FilesystemIterator::SKIP_DOTS),
+        RecursiveIteratorIterator::CHILD_FIRST,
+    );
+
+    foreach ($iterator as $item) {
+        $path = $item->getPathname();
+
+        if ($item->isFile()) {
+            $contents = file_get_contents($path);
+
+            if ($contents === false) {
+                fail("Unable to read generated file: {$path}");
+            }
+
+            if (! str_contains($contents, "\0")) {
+                $updated = str_replace(array_keys($replacements), array_values($replacements), $contents);
+
+                if ($updated !== $contents && file_put_contents($path, $updated) === false) {
+                    fail("Unable to update generated file: {$path}");
+                }
+            }
+        }
+
+        $updatedName = str_replace(
+            array_keys($replacements),
+            array_values($replacements),
+            $item->getFilename(),
+        );
+
+        if ($updatedName !== $item->getFilename()) {
+            $updatedPath = $item->getPath().DIRECTORY_SEPARATOR.$updatedName;
+
+            if (! rename($path, $updatedPath)) {
+                fail("Unable to rename generated path: {$path}");
+            }
+        }
+    }
+}
+
+/** @param list<string> $command */
+function run(array $command, string $workingDirectory): void
+{
+    fwrite(STDOUT, sprintf("\n\033[34m➜\033[0m %s\n", implode(' ', $command)));
+
+    $process = proc_open($command, [STDIN, STDOUT, STDERR], $pipes, $workingDirectory);
+
+    if (! is_resource($process)) {
+        fail(sprintf('Unable to start %s.', $command[0]));
+    }
+
+    $exitCode = proc_close($process);
+
+    if ($exitCode !== 0) {
+        fail(sprintf('%s failed with exit code %d. The generated files were kept.', $command[0], $exitCode), $exitCode);
+    }
+}
+
+$arguments = array_slice($argv, 1);
+$positionals = [];
+$organizationInput = null;
+$includeExample = false;
+
+for ($index = 0, $count = count($arguments); $index < $count; $index++) {
+    $argument = $arguments[$index];
+
+    if (in_array($argument, ['-h', '--help'], true)) {
+        fwrite(STDOUT, "Usage: php create-module [-o <organization>] [--example] <module-name>\n");
+        exit(0);
+    }
+
+    if ($argument === '--example') {
+        $includeExample = true;
+        continue;
+    }
+
+    if (in_array($argument, ['-o', '--organization'], true)) {
+        $organizationInput = trim($arguments[++$index] ?? '');
+
+        if ($organizationInput === '') {
+            fail("The {$argument} option requires an organization.");
+        }
+
+        continue;
+    }
+
+    if (str_starts_with($argument, '--organization=')) {
+        $organizationInput = trim(substr($argument, strlen('--organization=')));
+
+        if ($organizationInput === '') {
+            fail('The --organization option requires an organization.');
+        }
+
+        continue;
+    }
+
+    if (str_starts_with($argument, '-')) {
+        fail("Unknown option: {$argument}");
+    }
+
+    $positionals[] = $argument;
+}
+
+if (count($positionals) > 1) {
+    fail('Too many arguments. Usage: php create-module [-o <organization>] [--example] <module-name>');
+}
+
+$moduleInput = trim($positionals[0] ?? '');
+
+if ($moduleInput === '') {
+    fail('Missing module name. Usage: php create-module [-o <organization>] [--example] <module-name>');
+}
+
+if ($organizationInput === null) {
+    fwrite(STDOUT, 'Organization: ');
+    $organizationInput = trim(fgets(STDIN) ?: '');
+
+    if ($organizationInput === '') {
+        fail('The organization is required.');
+    }
+}
+
+$module = normalizeName($moduleInput, 'module name');
+$organization = normalizeName($organizationInput, 'organization');
+$target = __DIR__.DIRECTORY_SEPARATOR.'output'.DIRECTORY_SEPARATOR.$module['slug'];
+
+if (! is_dir(TEMPLATE_DIRECTORY)) {
+    fail('The template directory is missing.');
+}
+
+if (file_exists($target)) {
+    fail("The target path already exists: {$target}");
+}
+
+copyTemplate(TEMPLATE_DIRECTORY, $target);
+
+$exampleDirectory = $target.DIRECTORY_SEPARATOR.'.example';
+
+if ($includeExample) {
+    copyTemplate($exampleDirectory, $target);
+}
+
+deleteDirectory($exampleDirectory);
+
+$exampleDocumentation = $includeExample ? <<<'MARKDOWN'
+## Example
+
+The generated example includes a model, migration, seeder, controller, routes,
+and Inertia index and show pages.
+
+Run the migration and seed the example records in the consuming application:
+
+```bash
+php artisan migrate
+php artisan db:seed --class="{{ORGANIZATION_NAME}}\\{{MODULE_NAME}}\\Database\\Seeders\\ExampleSeeder"
+```
+
+Then visit `/{{MODULE_SLUG}}/examples` in the consuming application. The leading
+module slug can be changed through the module configuration.
+MARKDOWN : '';
+
+$defaultDocumentation = $includeExample ? '' : <<<'MARKDOWN'
+The generated starter page is available as `{{MODULE_NAME}}::Index` through the
+module's Inertia resolver.
+MARKDOWN;
+
+replacePlaceholders($target, [
+    '{{EXAMPLE_DOCUMENTATION}}' => $exampleDocumentation,
+    '{{DEFAULT_DOCUMENTATION}}' => $defaultDocumentation,
+    '{{ORGANIZATION_NAME}}' => $organization['name'],
+    '{{ORGANIZATION_SLUG}}' => $organization['slug'],
+    '{{ORGANIZATION_TITLE}}' => $organization['title'],
+    '{{MODULE_NAME}}' => $module['name'],
+    '{{MODULE_SLUG}}' => $module['slug'],
+    '{{MODULE_SNAKE}}' => $module['snake'],
+    '{{MODULE_TITLE}}' => $module['title'],
+]);
+
+info("Created {$organization['title']}/{$module['title']} in {$target}");
+
+run(['composer', 'install'], $target);
+run(['npm', 'install'], $target);
+run(['git', 'init', '--initial-branch=main'], $target);
+run(['git', 'add', '.'], $target);
+run(['git', 'commit', '-m', 'Initial commit'], $target);
+
+fwrite(STDOUT, "\n\033[32mModule ready.\033[0m\n");

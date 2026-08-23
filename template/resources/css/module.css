@@ -1,0 +1,254 @@
+:root {
+    --inertia-module-accent: #4f46e5;
+    --inertia-module-accent-strong: #3730a3;
+    --inertia-module-accent-soft: #eef2ff;
+    --inertia-module-background: #f6f7fb;
+    --inertia-module-surface: #ffffff;
+    --inertia-module-border: #e4e7ec;
+    --inertia-module-text: #182230;
+    --inertia-module-muted: #667085;
+    --inertia-module-shadow: 0 20px 45px -28px rgb(16 24 40 / 35%);
+}
+
+.inertia-module-shell {
+    min-height: 100vh;
+    box-sizing: border-box;
+    padding: clamp(2rem, 7vw, 6rem) 1.25rem;
+    color: var(--inertia-module-text);
+    background:
+        radial-gradient(circle at top left, rgb(79 70 229 / 12%), transparent 32rem),
+        var(--inertia-module-background);
+    font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+}
+
+.inertia-module-shell *,
+.inertia-module-shell *::before,
+.inertia-module-shell *::after {
+    box-sizing: border-box;
+}
+
+.inertia-module-container {
+    width: min(100%, 70rem);
+    margin: 0 auto;
+}
+
+.inertia-module-header {
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: 2rem;
+    margin-bottom: 2rem;
+}
+
+.inertia-module-eyebrow {
+    margin: 0 0 0.65rem;
+    color: var(--inertia-module-accent);
+    font-size: 0.75rem;
+    font-weight: 750;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+}
+
+.inertia-module-title {
+    margin: 0;
+    font-size: clamp(2rem, 5vw, 3.75rem);
+    font-weight: 750;
+    letter-spacing: -0.045em;
+    line-height: 1.05;
+}
+
+.inertia-module-description {
+    max-width: 42rem;
+    margin: 1rem 0 0;
+    color: var(--inertia-module-muted);
+    font-size: 1.05rem;
+    line-height: 1.7;
+}
+
+.inertia-module-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+}
+
+.inertia-module-panel {
+    overflow: hidden;
+    border: 1px solid var(--inertia-module-border);
+    border-radius: 1.25rem;
+    background: var(--inertia-module-surface);
+    box-shadow: var(--inertia-module-shadow);
+}
+
+.inertia-module-list {
+    display: grid;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+}
+
+.inertia-module-list-item + .inertia-module-list-item {
+    border-top: 1px solid var(--inertia-module-border);
+}
+
+.inertia-module-card-link {
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr) auto;
+    align-items: center;
+    gap: 1rem;
+    padding: 1.35rem 1.5rem;
+    color: inherit;
+    text-decoration: none;
+    transition: background-color 160ms ease, transform 160ms ease;
+}
+
+.inertia-module-card-link:hover {
+    background: var(--inertia-module-accent-soft);
+}
+
+.inertia-module-card-link:focus-visible,
+.inertia-module-button:focus-visible {
+    outline: 3px solid rgb(79 70 229 / 30%);
+    outline-offset: -3px;
+}
+
+.inertia-module-badge {
+    display: inline-grid;
+    min-width: 2.5rem;
+    height: 2.5rem;
+    place-items: center;
+    border-radius: 0.75rem;
+    color: var(--inertia-module-accent-strong);
+    background: var(--inertia-module-accent-soft);
+    font-size: 0.8rem;
+    font-weight: 750;
+}
+
+.inertia-module-card-title {
+    margin: 0;
+    font-size: 1rem;
+    font-weight: 700;
+}
+
+.inertia-module-card-copy {
+    margin: 0.35rem 0 0;
+    overflow: hidden;
+    color: var(--inertia-module-muted);
+    line-height: 1.55;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.inertia-module-arrow {
+    color: var(--inertia-module-accent);
+    font-size: 1.25rem;
+    transition: transform 160ms ease;
+}
+
+.inertia-module-card-link:hover .inertia-module-arrow {
+    transform: translateX(0.2rem);
+}
+
+.inertia-module-empty,
+.inertia-module-detail {
+    padding: clamp(2rem, 6vw, 4rem);
+}
+
+.inertia-module-empty {
+    text-align: center;
+}
+
+.inertia-module-empty-mark {
+    display: grid;
+    width: 3.5rem;
+    height: 3.5rem;
+    margin: 0 auto 1.25rem;
+    place-items: center;
+    border-radius: 1rem;
+    color: var(--inertia-module-accent);
+    background: var(--inertia-module-accent-soft);
+    font-size: 1.5rem;
+}
+
+.inertia-module-empty h2,
+.inertia-module-detail h2 {
+    margin: 0;
+    font-size: 1.35rem;
+}
+
+.inertia-module-empty p,
+.inertia-module-detail p {
+    margin: 0.75rem 0 0;
+    color: var(--inertia-module-muted);
+    line-height: 1.75;
+}
+
+.inertia-module-meta {
+    display: flex;
+    gap: 0.5rem;
+    margin-bottom: 1.5rem;
+    color: var(--inertia-module-muted);
+    font-size: 0.85rem;
+}
+
+.inertia-module-button {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    min-height: 2.75rem;
+    padding: 0 1rem;
+    border: 1px solid var(--inertia-module-border);
+    border-radius: 0.75rem;
+    color: var(--inertia-module-text);
+    background: var(--inertia-module-surface);
+    font-size: 0.9rem;
+    font-weight: 650;
+    text-decoration: none;
+    box-shadow: 0 1px 2px rgb(16 24 40 / 5%);
+    transition: border-color 160ms ease, color 160ms ease, transform 160ms ease;
+}
+
+.inertia-module-button:hover {
+    border-color: var(--inertia-module-accent);
+    color: var(--inertia-module-accent);
+    transform: translateY(-1px);
+}
+
+.inertia-module-footer {
+    margin-top: 1.25rem;
+    color: var(--inertia-module-muted);
+    font-size: 0.85rem;
+    text-align: center;
+}
+
+@media (max-width: 640px) {
+    .inertia-module-header {
+        align-items: flex-start;
+        flex-direction: column;
+    }
+
+    .inertia-module-card-link {
+        grid-template-columns: auto minmax(0, 1fr);
+    }
+
+    .inertia-module-arrow {
+        display: none;
+    }
+
+    .inertia-module-card-copy {
+        white-space: normal;
+    }
+}
+
+@media (prefers-color-scheme: dark) {
+    :root {
+        --inertia-module-accent: #a5b4fc;
+        --inertia-module-accent-strong: #c7d2fe;
+        --inertia-module-accent-soft: #24243f;
+        --inertia-module-background: #101218;
+        --inertia-module-surface: #181b23;
+        --inertia-module-border: #2a2f3a;
+        --inertia-module-text: #f2f4f7;
+        --inertia-module-muted: #98a2b3;
+        --inertia-module-shadow: 0 24px 60px -32px rgb(0 0 0 / 80%);
+    }
+}

@@ -1,0 +1,13 @@
+{
+    "$schema": "https://getcomposer.org/schema.json",
+    "name": "starter-solutions/inertia-module-template",
+    "description": "Create self-contained Laravel and Inertia module packages.",
+    "type": "project",
+    "license": "MIT",
+    "require": {
+        "php": "^8.3"
+    },
+    "bin": [
+        "create-module"
+    ]
+}
