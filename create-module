@@ -16,6 +16,112 @@ function info(string $message): void
     fwrite(STDOUT, "\033[32m✓\033[0m {$message}\n");
 }
 
+/** @return array{composer: string, npm: string, text: string, documentation: string} */
+function licenseDefinition(string $input, string $copyrightHolder): array
+{
+    $licenses = [
+        '1' => 'MIT',
+        '2' => 'Apache-2.0',
+        '3' => 'GPL-3.0-only',
+        '4' => 'proprietary',
+    ];
+    $normalized = $licenses[$input] ?? match (strtolower($input)) {
+        'mit' => 'MIT',
+        'apache-2.0', 'apache2', 'apache' => 'Apache-2.0',
+        'gpl-3.0-only', 'gpl-3.0', 'gpl3', 'gpl' => 'GPL-3.0-only',
+        'proprietary', 'private', 'closed' => 'proprietary',
+        default => fail("Unknown license: {$input}. Choose mit, apache, gpl, or proprietary."),
+    };
+    $copyright = sprintf('Copyright (c) %s %s', date('Y'), $copyrightHolder);
+
+    return match ($normalized) {
+        'MIT' => [
+            'composer' => 'MIT',
+            'npm' => 'MIT',
+            'text' => <<<TEXT
+MIT License
+
+{$copyright}
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+TEXT,
+            'documentation' => 'This module is open-source software licensed under the [MIT license](LICENSE.md).',
+        ],
+        'Apache-2.0' => [
+            'composer' => 'Apache-2.0',
+            'npm' => 'Apache-2.0',
+            'text' => <<<TEXT
+Apache License 2.0
+
+{$copyright}
+
+Licensed under the Apache License, Version 2.0 (the "License"); you may not use
+this file except in compliance with the License. You may obtain a copy of the
+License at:
+
+https://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software distributed
+under the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR
+CONDITIONS OF ANY KIND, either express or implied. See the License for the
+specific language governing permissions and limitations under the License.
+TEXT,
+            'documentation' => 'This module is open-source software licensed under the [Apache License 2.0](LICENSE.md).',
+        ],
+        'GPL-3.0-only' => [
+            'composer' => 'GPL-3.0-only',
+            'npm' => 'GPL-3.0-only',
+            'text' => <<<TEXT
+GNU General Public License v3.0 only
+
+{$copyright}
+
+This program is free software: you can redistribute it and/or modify it under
+the terms of the GNU General Public License as published by the Free Software
+Foundation, version 3 of the License.
+
+This program is distributed in the hope that it will be useful, but WITHOUT ANY
+WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A
+PARTICULAR PURPOSE. See the GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License along with
+this program. If not, see https://www.gnu.org/licenses/gpl-3.0.html.
+TEXT,
+            'documentation' => 'This module is open-source software licensed under the [GNU GPL v3.0 only](LICENSE.md).',
+        ],
+        'proprietary' => [
+            'composer' => 'proprietary',
+            'npm' => 'UNLICENSED',
+            'text' => <<<TEXT
+Proprietary License
+
+{$copyright}. All rights reserved.
+
+This software and its source code are confidential and proprietary. No part of
+the software may be used, copied, modified, distributed, sublicensed, or
+disclosed without prior written permission from {$copyrightHolder}.
+TEXT,
+            'documentation' => 'This module is proprietary software. See [LICENSE.md](LICENSE.md) for its usage restrictions.',
+        ],
+    };
+}
+
 /** @return array{name: string, slug: string, snake: string, title: string} */
 function normalizeName(string $input, string $label): array
 {
@@ -152,13 +258,14 @@ function run(array $command, string $workingDirectory): void
 $arguments = array_slice($argv, 1);
 $positionals = [];
 $organizationInput = null;
+$licenseInput = null;
 $includeExample = false;
 
 for ($index = 0, $count = count($arguments); $index < $count; $index++) {
     $argument = $arguments[$index];
 
     if (in_array($argument, ['-h', '--help'], true)) {
-        fwrite(STDOUT, "Usage: php create-module [-o <organization>] [--example] <module-name>\n");
+        fwrite(STDOUT, "Usage: php create-module [-o <organization>] [--license=mit|apache|gpl|proprietary] [--example] <module-name>\n");
         exit(0);
     }
 
@@ -187,6 +294,26 @@ for ($index = 0, $count = count($arguments); $index < $count; $index++) {
         continue;
     }
 
+    if ($argument === '--license') {
+        $licenseInput = trim($arguments[++$index] ?? '');
+
+        if ($licenseInput === '') {
+            fail('The --license option requires a license.');
+        }
+
+        continue;
+    }
+
+    if (str_starts_with($argument, '--license=')) {
+        $licenseInput = trim(substr($argument, strlen('--license=')));
+
+        if ($licenseInput === '') {
+            fail('The --license option requires a license.');
+        }
+
+        continue;
+    }
+
     if (str_starts_with($argument, '-')) {
         fail("Unknown option: {$argument}");
     }
@@ -195,13 +322,13 @@ for ($index = 0, $count = count($arguments); $index < $count; $index++) {
 }
 
 if (count($positionals) > 1) {
-    fail('Too many arguments. Usage: php create-module [-o <organization>] [--example] <module-name>');
+    fail('Too many arguments. Usage: php create-module [-o <organization>] [--license=mit|apache|gpl|proprietary] [--example] <module-name>');
 }
 
 $moduleInput = trim($positionals[0] ?? '');
 
 if ($moduleInput === '') {
-    fail('Missing module name. Usage: php create-module [-o <organization>] [--example] <module-name>');
+    fail('Missing module name. Usage: php create-module [-o <organization>] [--license=mit|apache|gpl|proprietary] [--example] <module-name>');
 }
 
 if ($organizationInput === null) {
@@ -213,8 +340,15 @@ if ($organizationInput === null) {
     }
 }
 
+if ($licenseInput === null) {
+    fwrite(STDOUT, "License:\n  1) MIT (default)\n  2) Apache-2.0\n  3) GPL-3.0-only\n  4) proprietary\nSelection [1]: ");
+    $licenseInput = trim(fgets(STDIN) ?: '');
+    $licenseInput = $licenseInput === '' ? '1' : $licenseInput;
+}
+
 $module = normalizeName($moduleInput, 'module name');
 $organization = normalizeName($organizationInput, 'organization');
+$license = licenseDefinition($licenseInput, $organization['title']);
 $target = __DIR__.DIRECTORY_SEPARATOR.'output'.DIRECTORY_SEPARATOR.$module['slug'];
 
 if (! is_dir(TEMPLATE_DIRECTORY)) {
@@ -274,6 +408,10 @@ replacePlaceholders($target, [
     '{{EXAMPLE_ROUTE_IMPORT}}' => $exampleRouteImport,
     '{{EXAMPLE_ROUTES}}' => $exampleRoutes,
     '{{DEFAULT_DOCUMENTATION}}' => $defaultDocumentation,
+    '{{LICENSE_COMPOSER}}' => $license['composer'],
+    '{{LICENSE_NPM}}' => $license['npm'],
+    '{{LICENSE_TEXT}}' => $license['text'],
+    '{{LICENSE_DOCUMENTATION}}' => $license['documentation'],
     '{{ORGANIZATION_NAME}}' => $organization['name'],
     '{{ORGANIZATION_SLUG}}' => $organization['slug'],
     '{{ORGANIZATION_TITLE}}' => $organization['title'],

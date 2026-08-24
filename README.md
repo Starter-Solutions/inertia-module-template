@@ -43,6 +43,30 @@ Without additional flags, the generated frontend contains a simple, styled
 `resources/js/Pages/Index.vue` starter page. It can be rendered from Laravel as
 `CustomerManagement::Index`.
 
+The generator also asks for the module license. Press Enter to use the default
+MIT license, or choose Apache-2.0, GPL-3.0-only, or proprietary:
+
+```text
+License:
+  1) MIT (default)
+  2) Apache-2.0
+  3) GPL-3.0-only
+  4) proprietary
+Selection [1]:
+```
+
+For non-interactive generation, pass one of the short license names:
+
+```bash
+php create-module -o starter-solutions --license=apache customer-management
+```
+
+Accepted values are `mit`, `apache`, `gpl`, and `proprietary`. The generated
+package metadata uses the corresponding SPDX identifier.
+
+The selection updates `LICENSE.md`, Composer metadata, npm metadata, and the
+generated README consistently.
+
 ### Example scaffold
 
 Pass `--example` to include a working integration example:

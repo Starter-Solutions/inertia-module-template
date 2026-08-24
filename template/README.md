@@ -161,4 +161,4 @@ completes a missing npm publish, tag, or GitHub Release.
 
 ## License
 
-This module is open-source software licensed under the [MIT license](LICENSE.md).
+{{LICENSE_DOCUMENTATION}}

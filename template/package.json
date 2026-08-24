@@ -3,7 +3,7 @@
     "version": "0.1.0",
     "description": "Headless frontend SDK for the {{MODULE_TITLE}} Laravel module.",
     "type": "module",
-    "license": "MIT",
+    "license": "{{LICENSE_NPM}}",
     "repository": {
         "type": "git",
         "url": "git+https://github.com/{{ORGANIZATION_SLUG}}/{{MODULE_SLUG}}.git"
