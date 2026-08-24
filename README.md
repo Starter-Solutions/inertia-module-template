@@ -171,7 +171,8 @@ the generated module's scoped package from GitHub Packages. Each generated
 repository contains a release workflow that publishes the version declared in
 `package.json` whenever that file changes on `main`, then creates the matching
 `vX.Y.Z` Composer tag. Every published version receives a GitHub Release with
-generated notes; SemVer prerelease versions are marked as GitHub Prereleases.
+generated notes; SemVer prerelease versions are published with the npm `next`
+dist-tag and marked as GitHub Prereleases.
 
 ## Developing a module
 

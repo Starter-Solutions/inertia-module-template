@@ -148,7 +148,8 @@ workflow. It then:
 
 Every stable version, including patch versions, receives a normal GitHub
 Release. Versions with a SemVer suffix such as `-beta.1` or `-rc.1` receive a
-GitHub Prerelease instead.
+GitHub Prerelease instead. Stable npm versions use the `latest` dist-tag;
+prerelease npm versions use `next` and therefore never replace `latest`.
 
 The pipeline-created tag is the Composer release, so for example npm `1.2.0`
 and Git tag `v1.2.0` expose the same source revision as version `1.2.0`.

@@ -101,7 +101,13 @@ jobs:
 
             - name: Publish frontend SDK
               if: steps.package.outputs.exists == 'false'
-              run: npm publish
+              shell: bash
+              run: |
+                  if [ '${{ steps.release.outputs.kind }}' = 'prerelease' ]; then
+                      npm publish --tag next
+                  else
+                      npm publish
+                  fi
               env:
                   NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
