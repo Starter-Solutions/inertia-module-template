@@ -53,6 +53,14 @@ form.post(module.url('/examples'))
 module.visit('/examples')
 ```
 
+Optional module components are exported separately and can be used or replaced
+by the host application:
+
+```ts
+import { ModuleShell } from '@{{ORGANIZATION_SLUG}}/{{MODULE_SLUG}}/components'
+import '@{{ORGANIZATION_SLUG}}/{{MODULE_SLUG}}/styles.css'
+```
+
 Add domain-specific types and composables under `resources/js/composables/`.
 They can read server props with `usePage()`, submit with `useForm()`, and
 navigate with the Inertia router. They are part of the public SDK; Vue

@@ -1,6 +1,6 @@
 <script setup>
 import { Head } from '@inertiajs/vue3'
-import ModuleShell from '../Components/ModuleShell.vue'
+import ModuleShell from '../components/ModuleShell.vue'
 </script>
 
 <template>

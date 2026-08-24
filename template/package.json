@@ -23,7 +23,12 @@
         "./composables": {
             "types": "./dist/composables/index.d.ts",
             "import": "./dist/composables/index.js"
-        }
+        },
+        "./components": {
+            "types": "./dist/components/index.d.ts",
+            "import": "./dist/components/index.js"
+        },
+        "./styles.css": "./dist/module.css"
     },
     "files": [
         "dist"

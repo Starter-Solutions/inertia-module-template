@@ -40,7 +40,7 @@ The generated repository is created under `output/<module-name>`. For example,
 the command above writes the module to `output/customer-management`.
 
 Without additional flags, the generated frontend contains a simple, styled
-`resources/js/Pages/Index.vue` starter page. It can be rendered from Laravel as
+`resources/js/pages/Index.vue` starter page. It can be rendered from Laravel as
 `CustomerManagement::Index`.
 
 The generator also asks for the module license. Press Enter to use the default

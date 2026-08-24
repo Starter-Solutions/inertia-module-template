@@ -1,21 +1,25 @@
 <script setup>
 import { Head, Link, useForm } from '@inertiajs/vue3'
-import ModuleShell from '../../Components/ModuleShell.vue'
+import ModuleShell from '../../components/ModuleShell.vue'
 
 const props = defineProps({
-    indexUrl: { type: String, required: true },
-    storeUrl: { type: String, required: true },
+    example: { type: Object, required: true },
+    showUrl: { type: String, required: true },
+    updateUrl: { type: String, required: true },
 })
 
-const form = useForm({ title: '', description: '' })
-const submit = () => form.post(props.storeUrl)
+const form = useForm({
+    title: props.example.title,
+    description: props.example.description ?? '',
+})
+const submit = () => form.put(props.updateUrl)
 </script>
 
 <template>
-    <Head title="Create example" />
-    <ModuleShell title="Create example" description="Add a record using a form that lives entirely inside the module package.">
+    <Head :title="`Edit ${example.title}`" />
+    <ModuleShell :title="`Edit ${example.title}`" description="Update this record through the module's controller endpoint.">
         <template #actions>
-            <Link :href="indexUrl" class="inertia-module-button">Cancel</Link>
+            <Link :href="showUrl" class="inertia-module-button">Cancel</Link>
         </template>
         <form class="inertia-module-form" @submit.prevent="submit">
             <label class="inertia-module-field">
@@ -30,7 +34,7 @@ const submit = () => form.post(props.storeUrl)
             </label>
             <div class="inertia-module-form-actions">
                 <button type="submit" class="inertia-module-button inertia-module-button-primary" :disabled="form.processing">
-                    {{ form.processing ? 'Creating…' : 'Create example' }}
+                    {{ form.processing ? 'Saving…' : 'Save changes' }}
                 </button>
             </div>
         </form>

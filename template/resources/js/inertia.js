@@ -1,4 +1,4 @@
-const pages = import.meta.glob('./Pages/**/*.vue')
+const pages = import.meta.glob('./pages/**/*.vue')
 const prefix = '{{MODULE_NAME}}::'
 
 export function resolveModulePage(name) {
@@ -7,7 +7,7 @@ export function resolveModulePage(name) {
     }
 
     const pageName = name.slice(prefix.length)
-    const path = `./Pages/${pageName}.vue`
+    const path = `./pages/${pageName}.vue`
     const resolve = pages[path]
 
     if (!resolve) {
