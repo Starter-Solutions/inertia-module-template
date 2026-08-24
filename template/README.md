@@ -39,9 +39,9 @@ It does not use Axios, `fetch`, or a separate JSON API:
 
 ```ts
 import {
-    useForm,
     useModuleNavigation,
 } from '@{{ORGANIZATION_SLUG}}/{{MODULE_SLUG}}'
+import { useForm } from '@inertiajs/vue3'
 
 const module = useModuleNavigation({
     baseUrl: '/{{MODULE_SLUG}}',
@@ -56,7 +56,9 @@ module.visit('/examples')
 Add domain-specific types and composables under `resources/js/composables/`.
 They can read server props with `usePage()`, submit with `useForm()`, and
 navigate with the Inertia router. They are part of the public SDK; Vue
-components and layouts in the host remain entirely replaceable.
+components and layouts in the host remain entirely replaceable. Import Inertia
+APIs directly from `@inertiajs/vue3`; this module does not re-export or wrap
+them.
 
 Laravel loads `{{ORGANIZATION_NAME}}\{{MODULE_NAME}}\{{MODULE_NAME}}ServiceProvider`
 automatically through package discovery.

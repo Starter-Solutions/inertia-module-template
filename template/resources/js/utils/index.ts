@@ -9,5 +9,3 @@ export function createModuleUrl(path = '', options: ModuleUrlOptions = {}): stri
 
     return normalizedPath === '' ? normalizedBase || '/' : `${normalizedBase}/${normalizedPath}`
 }
-
-export { router, useForm, usePage } from '@inertiajs/vue3'

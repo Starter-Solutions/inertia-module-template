@@ -16,7 +16,7 @@ export default defineConfig({
             entry: {
                 index: 'resources/js/index.ts',
                 'composables/index': 'resources/js/composables/index.ts',
-                'inertia/index': 'resources/js/inertia/index.ts',
+                'utils/index': 'resources/js/utils/index.ts',
             },
             formats: ['es'],
         },

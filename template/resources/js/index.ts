@@ -1,2 +1,2 @@
 export * from './composables/index'
-export * from './inertia/index'
+export * from './utils/index'

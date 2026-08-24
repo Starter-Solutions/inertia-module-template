@@ -16,9 +16,9 @@
             "types": "./dist/index.d.ts",
             "import": "./dist/index.js"
         },
-        "./inertia": {
-            "types": "./dist/inertia/index.d.ts",
-            "import": "./dist/inertia/index.js"
+        "./utils": {
+            "types": "./dist/utils/index.d.ts",
+            "import": "./dist/utils/index.js"
         },
         "./composables": {
             "types": "./dist/composables/index.d.ts",

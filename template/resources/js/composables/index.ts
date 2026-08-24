@@ -1,6 +1,6 @@
 import { computed } from 'vue'
 import { router, usePage } from '@inertiajs/vue3'
-import { createModuleUrl, type ModuleUrlOptions } from '../inertia/index'
+import { createModuleUrl, type ModuleUrlOptions } from '../utils/index'
 
 type VisitOptions = NonNullable<Parameters<typeof router.visit>[1]>
 type ReloadOptions = NonNullable<Parameters<typeof router.reload>[0]>
