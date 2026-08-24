@@ -125,13 +125,11 @@ resources belong in `resources/js/`.
 The version in `package.json` is the single source of truth. Composer does not
 need a version field: it derives the backend package version from Git tags.
 
-Change the version in `package.json`, synchronize the lock file, commit both
-files, and push to `main`:
+Change the version in `package.json`, commit it, and push to `main`:
 
 ```bash
-npm install --package-lock-only --ignore-scripts
-git add package.json package-lock.json
-git commit -m "Release frontend and backend"
+git add .
+git commit -m "Release 0.0.2"
 git push
 ```
 
