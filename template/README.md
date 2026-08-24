@@ -125,28 +125,36 @@ resources belong in `resources/js/`.
 The version in `package.json` is the single source of truth. Composer does not
 need a version field: it derives the backend package version from Git tags.
 
-Choose the appropriate semantic version bump, commit both changed package
+Change the version in `package.json`, synchronize the lock file, commit both
 files, and push to `main`:
 
 ```bash
-npm run version:patch # or version:minor / version:major
-release_version=$(node -p "require('./package.json').version")
+npm install --package-lock-only --ignore-scripts
 git add package.json package-lock.json
-git commit -m "Release v${release_version}"
+git commit -m "Release frontend and backend"
 git push
 ```
 
-The generated `Release` GitHub Actions workflow then:
+For example, change `0.0.1` to `0.0.2` for a patch release, `0.1.0` for a minor
+release, or `1.0.0` for a major release. Do not create the Git tag locally.
+
+The version change on `main` starts the generated `Release` GitHub Actions
+workflow. It then:
 
 1. type-checks and builds the frontend SDK;
-2. publishes the version to GitHub Packages if it is not already present; and
-3. creates and pushes the matching `vX.Y.Z` Git tag.
+2. publishes the version to GitHub Packages if it is not already present;
+3. creates the matching `vX.Y.Z` Composer tag; and
+4. creates a GitHub Release with generated release notes.
 
-That tag is the Composer release, so for example npm `1.2.0` and Git tag
-`v1.2.0` expose the same source revision as version `1.2.0`. Configure the
-repository in Packagist or your private Composer registry once so it observes
-new tags. Re-running a partially failed workflow safely completes a missing
-publish or tag.
+Every stable version, including patch versions, receives a normal GitHub
+Release. Versions with a SemVer suffix such as `-beta.1` or `-rc.1` receive a
+GitHub Prerelease instead.
+
+The pipeline-created tag is the Composer release, so for example npm `1.2.0`
+and Git tag `v1.2.0` expose the same source revision as version `1.2.0`.
+Configure the repository in Packagist or your private Composer registry once
+so it observes new tags. Re-running a partially failed workflow safely
+completes a missing npm publish, tag, or GitHub Release.
 
 {{DEFAULT_DOCUMENTATION}}
 

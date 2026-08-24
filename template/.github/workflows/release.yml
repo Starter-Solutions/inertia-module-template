@@ -60,6 +60,22 @@ jobs:
                   echo "version=$package_version" >> "$GITHUB_OUTPUT"
                   echo "tag=v$package_version" >> "$GITHUB_OUTPUT"
 
+                  if [[ "$package_version" == *-* ]]; then
+                      release_kind=prerelease
+                  else
+                      IFS=. read -r major minor patch <<< "$package_version"
+
+                      if [ "$patch" -ne 0 ]; then
+                          release_kind=patch
+                      elif [ "$minor" -ne 0 ]; then
+                          release_kind=minor
+                      else
+                          release_kind=major
+                      fi
+                  fi
+
+                  echo "kind=$release_kind" >> "$GITHUB_OUTPUT"
+
             - name: Validate existing tag
               shell: bash
               run: |
@@ -103,3 +119,27 @@ jobs:
                   git config user.email 41898282+github-actions[bot]@users.noreply.github.com
                   git tag -a "$tag" -m "Release $tag"
                   git push origin "$tag"
+
+            - name: Create GitHub release
+              shell: bash
+              run: |
+                  tag='${{ steps.release.outputs.tag }}'
+
+                  if gh release view "$tag" >/dev/null 2>&1; then
+                      echo "GitHub release $tag already exists."
+                      exit 0
+                  fi
+
+                  release_options=(
+                      --verify-tag
+                      --generate-notes
+                      --title "$tag"
+                  )
+
+                  if [ '${{ steps.release.outputs.kind }}' = 'prerelease' ]; then
+                      release_options+=(--prerelease)
+                  fi
+
+                  gh release create "$tag" "${release_options[@]}"
+              env:
+                  GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}

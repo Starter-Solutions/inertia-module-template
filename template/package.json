@@ -32,10 +32,7 @@
         "build": "vite build",
         "dev": "vite build --watch",
         "prepack": "npm run build",
-        "typecheck": "vue-tsc --noEmit",
-        "version:patch": "npm version patch --no-git-tag-version",
-        "version:minor": "npm version minor --no-git-tag-version",
-        "version:major": "npm version major --no-git-tag-version"
+        "typecheck": "vue-tsc --noEmit"
     },
     "engines": {
         "node": ">=20.19.0"
