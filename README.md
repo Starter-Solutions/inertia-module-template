@@ -98,7 +98,10 @@ A module keeps all parts of a feature or domain in one place. This may include:
 
 Related functionality is therefore versioned together. The Laravel application
 acts as the host, while the module provides its backend logic and corresponding
-Inertia interface as a single unit.
+Inertia interface as a single unit. Generated modules also expose a headless npm
+SDK containing TypeScript types and UI-free, Inertia-native Vue composables.
+The SDK does not introduce a separate JSON client. The npm version and Composer
+Git tag are created from the same release revision.
 
 ## Installing a module in a Laravel application
 
@@ -163,17 +166,23 @@ into `createInertiaApp()`, retains the host's standard `pages` and `Pages`
 directories, discovers every module entry under `vendor/`, lazy-loads package
 pages, and handles symlinked Composer path repositories.
 
+When the host needs the module's public headless API, it additionally installs
+the generated module's scoped package from GitHub Packages. Each generated
+repository contains a release workflow that publishes the version declared in
+`package.json` and creates the matching `vX.Y.Z` Composer tag.
+
 ## Developing a module
 
 The service provider is the module's entry point. Use `register()` for container
 bindings and configuration. Use `boot()` to load resources such as routes,
 views, migrations, and publishable assets.
 
-The generated frontend uses Vue 3. Each package exposes a small JavaScript
-module with a `resolveModulePage()` function, while the shared
+The generated frontend uses Vue 3. Each Composer package exposes a small
+JavaScript module with a `resolveModulePage()` function, while the shared
 `@starter-solutions/inertia-modules` Vite plugin hooks those resolvers into the
 host build. A Vue plugin is not required because Inertia resolves a page before
-the Vue application is mounted.
+the Vue application is mounted. Its separately published npm SDK is intended
+for stable, headless imports by the host and does not contain the module pages.
 
 ## Scope
 

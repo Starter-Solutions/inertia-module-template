@@ -5,6 +5,7 @@ declare(strict_types=1);
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 use Inertia\Response;
+{{EXAMPLE_ROUTE_IMPORT}}
 
 Route::name('{{MODULE_SLUG}}.')
     ->middleware(config('{{MODULE_SLUG}}.middleware', 'web'))
@@ -12,4 +13,5 @@ Route::name('{{MODULE_SLUG}}.')
     ->group(function (): void {
         Route::get('/', fn (): Response => Inertia::render('{{MODULE_NAME}}::Index'))
             ->name('index');
+{{EXAMPLE_ROUTES}}
     });

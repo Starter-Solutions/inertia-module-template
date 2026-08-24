@@ -1,8 +1,9 @@
 # {{MODULE_TITLE}}
 
 `{{ORGANIZATION_SLUG}}/{{MODULE_SLUG}}` is a self-contained Laravel and Inertia.js
-module. It keeps the backend logic and its corresponding frontend resources in
-a single versioned package.
+module. Its Composer package provides the backend and optional module pages;
+`@{{ORGANIZATION_SLUG}}/{{MODULE_SLUG}}` provides the public, headless frontend
+API. Both artifacts are released with the same version.
 
 ## Requirements
 
@@ -19,6 +20,43 @@ Install the module in the consuming Laravel application:
 ```bash
 composer require {{ORGANIZATION_SLUG}}/{{MODULE_SLUG}}
 ```
+
+Install its headless frontend SDK from GitHub Packages:
+
+```ini
+# .npmrc in the host application
+@{{ORGANIZATION_SLUG}}:registry=https://npm.pkg.github.com
+//npm.pkg.github.com/:_authToken=${NODE_AUTH_TOKEN}
+```
+
+```bash
+npm install @{{ORGANIZATION_SLUG}}/{{MODULE_SLUG}}
+```
+
+`NODE_AUTH_TOKEN` needs permission to read packages from the GitHub
+organization. The SDK exports Inertia-native helpers and UI-free composables.
+It does not use Axios, `fetch`, or a separate JSON API:
+
+```ts
+import {
+    useForm,
+    useModuleNavigation,
+} from '@{{ORGANIZATION_SLUG}}/{{MODULE_SLUG}}'
+
+const module = useModuleNavigation({
+    baseUrl: '/{{MODULE_SLUG}}',
+})
+
+const form = useForm({ name: '' })
+
+form.post(module.url('/examples'))
+module.visit('/examples')
+```
+
+Add domain-specific types and composables under `resources/js/composables/`.
+They can read server props with `usePage()`, submit with `useForm()`, and
+navigate with the Inertia router. They are part of the public SDK; Vue
+components and layouts in the host remain entirely replaceable.
 
 Laravel loads `{{ORGANIZATION_NAME}}\{{MODULE_NAME}}\{{MODULE_NAME}}ServiceProvider`
 automatically through package discovery.
@@ -81,6 +119,34 @@ npm install
 
 Backend code belongs in `src/`. Inertia pages, components, and other frontend
 resources belong in `resources/js/`.
+
+## Releasing
+
+The version in `package.json` is the single source of truth. Composer does not
+need a version field: it derives the backend package version from Git tags.
+
+Choose the appropriate semantic version bump, commit both changed package
+files, and push to `main`:
+
+```bash
+npm run version:patch # or version:minor / version:major
+release_version=$(node -p "require('./package.json').version")
+git add package.json package-lock.json
+git commit -m "Release v${release_version}"
+git push
+```
+
+The generated `Release` GitHub Actions workflow then:
+
+1. type-checks and builds the frontend SDK;
+2. publishes the version to GitHub Packages if it is not already present; and
+3. creates and pushes the matching `vX.Y.Z` Git tag.
+
+That tag is the Composer release, so for example npm `1.2.0` and Git tag
+`v1.2.0` expose the same source revision as version `1.2.0`. Configure the
+repository in Packagist or your private Composer registry once so it observes
+new tags. Re-running a partially failed workflow safely completes a missing
+publish or tag.
 
 {{DEFAULT_DOCUMENTATION}}
 

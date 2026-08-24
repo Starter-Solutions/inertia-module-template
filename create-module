@@ -59,7 +59,8 @@ function deleteDirectory(string $directory): void
     }
 }
 
-function copyTemplate(string $source, string $target): void
+/** @param list<string> $excludedNames */
+function copyTemplate(string $source, string $target, array $excludedNames = []): void
 {
     if (! is_dir($target) && ! mkdir($target, 0755, true)) {
         fail("Unable to create target directory: {$target}");
@@ -68,10 +69,14 @@ function copyTemplate(string $source, string $target): void
     $items = new FilesystemIterator($source, FilesystemIterator::SKIP_DOTS);
 
     foreach ($items as $item) {
+        if (in_array($item->getFilename(), $excludedNames, true)) {
+            continue;
+        }
+
         $destination = $target.DIRECTORY_SEPARATOR.$item->getFilename();
 
         if ($item->isDir()) {
-            copyTemplate($item->getPathname(), $destination);
+            copyTemplate($item->getPathname(), $destination, $excludedNames);
             continue;
         }
 
@@ -223,9 +228,21 @@ if (file_exists($target)) {
 copyTemplate(TEMPLATE_DIRECTORY, $target);
 
 $exampleDirectory = $target.DIRECTORY_SEPARATOR.'.example';
+$exampleRouteImport = '';
+$exampleRoutes = '';
 
 if ($includeExample) {
-    copyTemplate($exampleDirectory, $target);
+    $routeFragmentsDirectory = $exampleDirectory.DIRECTORY_SEPARATOR.'.route-fragments';
+    $routeImportPath = $routeFragmentsDirectory.DIRECTORY_SEPARATOR.'imports.stub';
+    $routesPath = $routeFragmentsDirectory.DIRECTORY_SEPARATOR.'group.stub';
+    $exampleRouteImport = file_get_contents($routeImportPath);
+    $exampleRoutes = file_get_contents($routesPath);
+
+    if ($exampleRouteImport === false || $exampleRoutes === false) {
+        fail('Unable to read the example route fragments.');
+    }
+
+    copyTemplate($exampleDirectory, $target, ['.route-fragments']);
 }
 
 deleteDirectory($exampleDirectory);
@@ -254,6 +271,8 @@ MARKDOWN;
 
 replacePlaceholders($target, [
     '{{EXAMPLE_DOCUMENTATION}}' => $exampleDocumentation,
+    '{{EXAMPLE_ROUTE_IMPORT}}' => $exampleRouteImport,
+    '{{EXAMPLE_ROUTES}}' => $exampleRoutes,
     '{{DEFAULT_DOCUMENTATION}}' => $defaultDocumentation,
     '{{ORGANIZATION_NAME}}' => $organization['name'],
     '{{ORGANIZATION_SLUG}}' => $organization['slug'],

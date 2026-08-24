@@ -1,0 +1,105 @@
+name: Release
+
+on:
+    push:
+        branches:
+            - main
+        paths:
+            - package.json
+    workflow_dispatch:
+
+concurrency:
+    group: release
+    cancel-in-progress: false
+
+permissions:
+    contents: write
+    packages: write
+
+jobs:
+    release:
+        name: Publish frontend and tag backend
+        runs-on: ubuntu-latest
+
+        steps:
+            - name: Check out repository
+              uses: actions/checkout@v6
+              with:
+                  fetch-depth: 0
+
+            - name: Set up Node.js
+              uses: actions/setup-node@v6
+              with:
+                  node-version: 24.x
+                  registry-url: https://npm.pkg.github.com
+                  scope: '@{{ORGANIZATION_SLUG}}'
+                  package-manager-cache: false
+
+            - name: Install dependencies
+              run: npm ci
+
+            - name: Validate frontend SDK
+              run: |
+                  npm run typecheck
+                  npm run build
+                  npm pack --dry-run
+
+            - name: Read and validate release version
+              id: release
+              shell: bash
+              run: |
+                  package_name=$(node --print "require('./package.json').name")
+                  package_version=$(node --print "require('./package.json').version")
+
+                  if ! node -e "const v = process.argv[1]; if (!/^\\d+\\.\\d+\\.\\d+(?:-[0-9A-Za-z.-]+)?$/.test(v)) process.exit(1)" "$package_version"; then
+                      echo "package.json contains an invalid release version: $package_version" >&2
+                      exit 1
+                  fi
+
+                  echo "name=$package_name" >> "$GITHUB_OUTPUT"
+                  echo "version=$package_version" >> "$GITHUB_OUTPUT"
+                  echo "tag=v$package_version" >> "$GITHUB_OUTPUT"
+
+            - name: Validate existing tag
+              shell: bash
+              run: |
+                  tag='${{ steps.release.outputs.tag }}'
+                  existing_commit=$(git rev-list -n 1 "$tag" 2>/dev/null || true)
+
+                  if [ -n "$existing_commit" ] && [ "$existing_commit" != "$GITHUB_SHA" ]; then
+                      echo "$tag already points to $existing_commit instead of $GITHUB_SHA." >&2
+                      exit 1
+                  fi
+
+            - name: Check GitHub Packages
+              id: package
+              shell: bash
+              run: |
+                  if npm view '${{ steps.release.outputs.name }}@${{ steps.release.outputs.version }}' version --registry=https://npm.pkg.github.com >/dev/null 2>&1; then
+                      echo "exists=true" >> "$GITHUB_OUTPUT"
+                  else
+                      echo "exists=false" >> "$GITHUB_OUTPUT"
+                  fi
+              env:
+                  NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+            - name: Publish frontend SDK
+              if: steps.package.outputs.exists == 'false'
+              run: npm publish
+              env:
+                  NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+            - name: Tag Composer release
+              shell: bash
+              run: |
+                  tag='${{ steps.release.outputs.tag }}'
+
+                  if git rev-parse "$tag" >/dev/null 2>&1; then
+                      echo "$tag already exists on this commit."
+                      exit 0
+                  fi
+
+                  git config user.name github-actions[bot]
+                  git config user.email 41898282+github-actions[bot]@users.noreply.github.com
+                  git tag -a "$tag" -m "Release $tag"
+                  git push origin "$tag"

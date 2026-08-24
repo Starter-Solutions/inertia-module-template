@@ -1,6 +1,56 @@
 {
     "name": "@{{ORGANIZATION_SLUG}}/{{MODULE_SLUG}}",
     "version": "0.1.0",
-    "private": true,
-    "description": "Frontend resources for the {{MODULE_TITLE}} module"
+    "description": "Headless frontend SDK for the {{MODULE_TITLE}} Laravel module.",
+    "type": "module",
+    "license": "MIT",
+    "repository": {
+        "type": "git",
+        "url": "git+https://github.com/{{ORGANIZATION_SLUG}}/{{MODULE_SLUG}}.git"
+    },
+    "publishConfig": {
+        "registry": "https://npm.pkg.github.com"
+    },
+    "exports": {
+        ".": {
+            "types": "./dist/index.d.ts",
+            "import": "./dist/index.js"
+        },
+        "./inertia": {
+            "types": "./dist/inertia/index.d.ts",
+            "import": "./dist/inertia/index.js"
+        },
+        "./composables": {
+            "types": "./dist/composables/index.d.ts",
+            "import": "./dist/composables/index.js"
+        }
+    },
+    "files": [
+        "dist"
+    ],
+    "scripts": {
+        "build": "vite build",
+        "dev": "vite build --watch",
+        "prepack": "npm run build",
+        "typecheck": "vue-tsc --noEmit",
+        "version:patch": "npm version patch --no-git-tag-version",
+        "version:minor": "npm version minor --no-git-tag-version",
+        "version:major": "npm version major --no-git-tag-version"
+    },
+    "engines": {
+        "node": ">=20.19.0"
+    },
+    "peerDependencies": {
+        "@inertiajs/vue3": "^2.0 || ^3.0",
+        "vue": "^3.5"
+    },
+    "devDependencies": {
+        "@inertiajs/vue3": "^2.0.0",
+        "@vitejs/plugin-vue": "^6.0.0",
+        "typescript": "^5.9.0",
+        "vite": "^7.0.0 || ^8.0.0",
+        "vite-plugin-dts": "^4.5.0",
+        "vue": "^3.5.0",
+        "vue-tsc": "^3.0.0"
+    }
 }
