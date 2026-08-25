@@ -38,18 +38,9 @@ organization. The SDK exports Inertia-native helpers and UI-free composables.
 It does not use Axios, `fetch`, or a separate JSON API:
 
 ```ts
-import {
-    useModuleNavigation,
-} from '@{{ORGANIZATION_SLUG}}/{{MODULE_SLUG}}'
-import { useForm } from '@inertiajs/vue3'
+import { useModuleNavigation } from '@{{ORGANIZATION_SLUG}}/{{MODULE_SLUG}}'
 
-const module = useModuleNavigation({
-    baseUrl: '/{{MODULE_SLUG}}',
-})
-
-const form = useForm({ name: '' })
-
-form.post(module.url('/examples'))
+const module = useModuleNavigation()
 module.visit('/examples')
 ```
 

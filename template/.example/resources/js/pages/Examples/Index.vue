@@ -1,17 +1,9 @@
-<script setup>
+<script setup lang="ts">
 import { Link, Head } from '@inertiajs/vue3'
 import ModuleShell from '../../components/ModuleShell.vue'
+import { useExample } from '../../composables/index'
 
-defineProps({
-    examples: {
-        type: Array,
-        required: true,
-    },
-    createUrl: {
-        type: String,
-        required: true,
-    },
-})
+const { examples, urls } = useExample()
 </script>
 
 <template>
@@ -22,7 +14,7 @@ defineProps({
         description="A small end-to-end example loaded directly from the module package."
     >
         <template #actions>
-            <Link :href="createUrl" class="inertia-module-button inertia-module-button-primary">
+            <Link :href="urls.create()" class="inertia-module-button inertia-module-button-primary">
                 New example
             </Link>
         </template>
@@ -39,7 +31,7 @@ defineProps({
                 :key="example.id"
                 class="inertia-module-list-item"
             >
-                <Link :href="example.url" class="inertia-module-card-link">
+                <Link :href="urls.show(example.id)" class="inertia-module-card-link">
                     <span class="inertia-module-badge">{{ example.id }}</span>
                     <span>
                         <span class="inertia-module-card-title">{{ example.title }}</span>

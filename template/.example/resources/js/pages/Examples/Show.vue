@@ -1,41 +1,38 @@
-<script setup>
+<script setup lang="ts">
 import { Link, Head } from '@inertiajs/vue3'
 import ModuleShell from '../../components/ModuleShell.vue'
+import { useExample } from '../../composables/index'
 
-defineProps({
-    example: {
-        type: Object,
-        required: true,
-    },
-    indexUrl: {
-        type: String,
-        required: true,
-    },
-    editUrl: {
-        type: String,
-        required: true,
-    },
-})
+const exampleApi = useExample()
+const example = exampleApi.example
+const destroy = () => {
+    if (example.value && window.confirm(`Delete ${example.value.title}?`)) {
+        exampleApi.delete(example.value.id)
+    }
+}
 </script>
 
 <template>
-    <Head :title="example.title" />
+    <Head :title="example?.title ?? 'Example'" />
 
     <ModuleShell
-        :title="example.title"
+        :title="example?.title ?? 'Example'"
         description="This detail page is rendered by the module's controller and Vue frontend."
     >
         <template #actions>
-            <Link :href="indexUrl" class="inertia-module-button">
+            <Link :href="exampleApi.urls.index()" class="inertia-module-button">
                 <span aria-hidden="true">←</span>
                 All examples
             </Link>
-            <Link :href="editUrl" class="inertia-module-button inertia-module-button-primary">
+            <Link v-if="example" :href="exampleApi.urls.edit(example.id)" class="inertia-module-button inertia-module-button-primary">
                 Edit example
             </Link>
+            <button v-if="example" type="button" class="inertia-module-button" @click="destroy">
+                Delete example
+            </button>
         </template>
 
-        <article class="inertia-module-detail">
+        <article v-if="example" class="inertia-module-detail">
             <div class="inertia-module-meta">
                 <span>Example record</span>
                 <span aria-hidden="true">·</span>

@@ -1,25 +1,23 @@
-<script setup>
-import { Head, Link, useForm } from '@inertiajs/vue3'
+<script setup lang="ts">
+import { Head, Link } from '@inertiajs/vue3'
 import ModuleShell from '../../components/ModuleShell.vue'
+import { useExample } from '../../composables/index'
 
-const props = defineProps({
-    example: { type: Object, required: true },
-    showUrl: { type: String, required: true },
-    updateUrl: { type: String, required: true },
-})
-
-const form = useForm({
-    title: props.example.title,
-    description: props.example.description ?? '',
-})
-const submit = () => form.put(props.updateUrl)
+const exampleApi = useExample()
+const example = exampleApi.example
+const form = exampleApi.form(example.value ?? {})
+const submit = () => {
+    if (example.value) {
+        exampleApi.patch(example.value.id, form)
+    }
+}
 </script>
 
 <template>
-    <Head :title="`Edit ${example.title}`" />
-    <ModuleShell :title="`Edit ${example.title}`" description="Update this record through the module's controller endpoint.">
+    <Head :title="`Edit ${example?.title ?? 'example'}`" />
+    <ModuleShell :title="`Edit ${example?.title ?? 'example'}`" description="Update this record through the module's controller endpoint.">
         <template #actions>
-            <Link :href="showUrl" class="inertia-module-button">Cancel</Link>
+            <Link v-if="example" :href="exampleApi.urls.show(example.id)" class="inertia-module-button">Cancel</Link>
         </template>
         <form class="inertia-module-form" @submit.prevent="submit">
             <label class="inertia-module-field">

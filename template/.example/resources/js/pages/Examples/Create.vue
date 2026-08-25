@@ -1,21 +1,18 @@
-<script setup>
-import { Head, Link, useForm } from '@inertiajs/vue3'
+<script setup lang="ts">
+import { Head, Link } from '@inertiajs/vue3'
 import ModuleShell from '../../components/ModuleShell.vue'
+import { useExample } from '../../composables/index'
 
-const props = defineProps({
-    indexUrl: { type: String, required: true },
-    storeUrl: { type: String, required: true },
-})
-
-const form = useForm({ title: '', description: '' })
-const submit = () => form.post(props.storeUrl)
+const exampleApi = useExample()
+const form = exampleApi.form()
+const submit = () => exampleApi.post(form)
 </script>
 
 <template>
     <Head title="Create example" />
     <ModuleShell title="Create example" description="Add a record using a form that lives entirely inside the module package.">
         <template #actions>
-            <Link :href="indexUrl" class="inertia-module-button">Cancel</Link>
+            <Link :href="exampleApi.urls.index()" class="inertia-module-button">Cancel</Link>
         </template>
         <form class="inertia-module-form" @submit.prevent="submit">
             <label class="inertia-module-field">

@@ -364,6 +364,7 @@ copyTemplate(TEMPLATE_DIRECTORY, $target);
 $exampleDirectory = $target.DIRECTORY_SEPARATOR.'.example';
 $exampleRouteImport = '';
 $exampleRoutes = '';
+$exampleComposableExport = '';
 
 if ($includeExample) {
     $routeFragmentsDirectory = $exampleDirectory.DIRECTORY_SEPARATOR.'.route-fragments';
@@ -371,6 +372,7 @@ if ($includeExample) {
     $routesPath = $routeFragmentsDirectory.DIRECTORY_SEPARATOR.'group.stub';
     $exampleRouteImport = file_get_contents($routeImportPath);
     $exampleRoutes = file_get_contents($routesPath);
+    $exampleComposableExport = "export * from './useExample'";
 
     if ($exampleRouteImport === false || $exampleRoutes === false) {
         fail('Unable to read the example route fragments.');
@@ -385,7 +387,24 @@ $exampleDocumentation = $includeExample ? <<<'MARKDOWN'
 ## Example
 
 The generated example includes a model, migration, seeder, controller, resource
-routes, and Inertia pages for listing, viewing, creating, and editing records.
+routes, and Inertia pages for listing, viewing, creating, editing, and deleting
+records. Its public `useExample()` composable is the typed boundary between the
+controller and frontend:
+
+```ts
+import { useExample } from '@{{ORGANIZATION_SLUG}}/{{MODULE_SLUG}}'
+
+const examples = useExample()
+const form = examples.form({ title: 'Example', description: '' })
+
+examples.index()
+examples.post(form)
+examples.patch(1, form)
+examples.delete(1)
+```
+
+`useExample()` also exposes reactive `page`, `examples`, and `example` props,
+plus URL helpers for every example resource route under `urls`.
 
 Run the migration and seed the example records in the consuming application:
 
@@ -407,6 +426,7 @@ replacePlaceholders($target, [
     '{{EXAMPLE_DOCUMENTATION}}' => $exampleDocumentation,
     '{{EXAMPLE_ROUTE_IMPORT}}' => $exampleRouteImport,
     '{{EXAMPLE_ROUTES}}' => $exampleRoutes,
+    '{{EXAMPLE_COMPOSABLE_EXPORT}}' => $exampleComposableExport,
     '{{DEFAULT_DOCUMENTATION}}' => $defaultDocumentation,
     '{{LICENSE_COMPOSER}}' => $license['composer'],
     '{{LICENSE_NPM}}' => $license['npm'],

@@ -22,18 +22,13 @@ final class ExampleController
                     'id' => $example->getKey(),
                     'title' => $example->title,
                     'description' => $example->description,
-                    'url' => route('{{MODULE_SLUG}}.examples.show', $example),
                 ]),
-            'createUrl' => route('{{MODULE_SLUG}}.examples.create'),
         ]);
     }
 
     public function create(): Response
     {
-        return Inertia::render('{{MODULE_NAME}}::Examples/Create', [
-            'indexUrl' => route('{{MODULE_SLUG}}.examples.index'),
-            'storeUrl' => route('{{MODULE_SLUG}}.examples.store'),
-        ]);
+        return Inertia::render('{{MODULE_NAME}}::Examples/Create');
     }
 
     public function store(Request $request): RedirectResponse
@@ -53,8 +48,6 @@ final class ExampleController
                 'title' => $example->title,
                 'description' => $example->description,
             ],
-            'editUrl' => route('{{MODULE_SLUG}}.examples.edit', $example),
-            'indexUrl' => route('{{MODULE_SLUG}}.examples.index'),
         ]);
     }
 
@@ -66,8 +59,6 @@ final class ExampleController
                 'title' => $example->title,
                 'description' => $example->description,
             ],
-            'showUrl' => route('{{MODULE_SLUG}}.examples.show', $example),
-            'updateUrl' => route('{{MODULE_SLUG}}.examples.update', $example),
         ]);
     }
 
@@ -78,6 +69,15 @@ final class ExampleController
         return redirect()
             ->route('{{MODULE_SLUG}}.examples.show', $example)
             ->with('success', 'Example updated.');
+    }
+
+    public function destroy(Example $example): RedirectResponse
+    {
+        $example->delete();
+
+        return redirect()
+            ->route('{{MODULE_SLUG}}.examples.index')
+            ->with('success', 'Example deleted.');
     }
 
     /** @return array{title: string, description: string|null} */
