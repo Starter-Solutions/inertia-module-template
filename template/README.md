@@ -158,6 +158,11 @@ completes a missing npm publish, tag, or GitHub Release.
 
 {{DEFAULT_DOCUMENTATION}}
 
+The frontend package uses the open-source
+[`@starter-solutions/vue-ui`](https://www.npmjs.com/package/@starter-solutions/vue-ui)
+component library by default. Import components and composables directly from
+`@starter-solutions/vue-ui`; `ModuleShell` also loads the package's shared stylesheet.
+
 {{EXAMPLE_DOCUMENTATION}}
 
 ## License

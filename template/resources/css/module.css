@@ -158,6 +158,12 @@
     text-align: center;
 }
 
+.inertia-module-ui-card {
+    max-width: 32rem;
+    margin: 0 auto;
+    text-align: left;
+}
+
 .inertia-module-empty-mark {
     display: grid;
     width: 3.5rem;

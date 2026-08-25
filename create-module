@@ -423,6 +423,7 @@ module's Inertia resolver.
 MARKDOWN;
 
 replacePlaceholders($target, [
+    '{{VUE_UI_PATH}}' => '../../vue-ui',
     '{{EXAMPLE_DOCUMENTATION}}' => $exampleDocumentation,
     '{{EXAMPLE_ROUTE_IMPORT}}' => $exampleRouteImport,
     '{{EXAMPLE_ROUTES}}' => $exampleRoutes,

@@ -47,7 +47,8 @@
     },
     "peerDependencies": {
         "@inertiajs/vue3": "^2.0 || ^3.0",
-        "vue": "^3.5"
+        "vue": "^3.5",
+        "@starter-solutions/vue-ui": "^0.1.0"
     },
     "devDependencies": {
         "@inertiajs/vue3": "^2.0.0",
@@ -56,6 +57,7 @@
         "vite": "^7.0.0 || ^8.0.0",
         "vite-plugin-dts": "^4.5.0",
         "vue": "^3.5.0",
-        "vue-tsc": "^3.0.0"
+        "vue-tsc": "^3.0.0",
+        "@starter-solutions/vue-ui": "file:{{VUE_UI_PATH}}"
     }
 }
