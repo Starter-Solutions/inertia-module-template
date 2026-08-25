@@ -359,7 +359,7 @@ if (file_exists($target)) {
     fail("The target path already exists: {$target}");
 }
 
-copyTemplate(TEMPLATE_DIRECTORY, $target);
+copyTemplate(TEMPLATE_DIRECTORY, $target, ['node_modules', 'dist']);
 
 $exampleDirectory = $target.DIRECTORY_SEPARATOR.'.example';
 $exampleRouteImport = '';
