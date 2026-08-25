@@ -51,8 +51,8 @@ export function useExample(options: ExampleOptions = {}) {
 
     return {
         page,
-        examples: computed(() => page.props.examples ?? []),
-        example: computed(() => page.props.example),
+        examples: computed(() => page.props?.examples ?? []),
+        example: computed(() => page.props?.example),
         url,
         urls,
         isCurrent: (path = '') => computed(() => page.url.startsWith(resourceUrl(path))),
