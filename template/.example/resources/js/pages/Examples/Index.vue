@@ -1,5 +1,8 @@
 <script setup lang="ts">
 import { Link, Head } from '@inertiajs/vue3'
+import { Badge } from '@starter-solutions/vue-ui/base/badge'
+import { Button } from '@starter-solutions/vue-ui/base/button'
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@starter-solutions/vue-ui/base/card'
 import ModuleShell from '../../components/ModuleShell.vue'
 import { useExample } from '../../composables/index'
 
@@ -14,30 +17,34 @@ const { examples, urls } = useExample()
         description="A small end-to-end example loaded directly from the module package."
     >
         <template #actions>
-            <Link :href="urls.create()" class="inertia-module-button inertia-module-button-primary">
-                New example
-            </Link>
+            <Button as-child>
+                <Link :href="urls.create()">New example</Link>
+            </Button>
         </template>
 
-        <div v-if="examples.length === 0" class="inertia-module-empty">
-            <div class="inertia-module-empty-mark" aria-hidden="true">◇</div>
-            <h2>No example records yet</h2>
-            <p>Run the module's example seeder and refresh this page.</p>
-        </div>
+        <Card v-if="examples.length === 0">
+            <CardHeader class="items-center py-16 text-center">
+                <CardTitle>No example records yet</CardTitle>
+                <CardDescription>Run the module's example seeder and refresh this page.</CardDescription>
+            </CardHeader>
+        </Card>
 
-        <ul v-else class="inertia-module-list">
+        <ul v-else class="grid gap-4">
             <li
                 v-for="example in examples"
                 :key="example.id"
-                class="inertia-module-list-item"
             >
-                <Link :href="urls.show(example.id)" class="inertia-module-card-link">
-                    <span class="inertia-module-badge">{{ example.id }}</span>
-                    <span>
-                        <span class="inertia-module-card-title">{{ example.title }}</span>
-                        <span class="inertia-module-card-copy">{{ example.description }}</span>
-                    </span>
-                    <span class="inertia-module-arrow" aria-hidden="true">→</span>
+                <Link :href="urls.show(example.id)" class="block rounded-xl focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring">
+                    <Card class="transition-colors hover:bg-accent/50">
+                        <CardContent class="flex items-center gap-4 py-6">
+                            <Badge variant="secondary">#{{ example.id }}</Badge>
+                            <div class="min-w-0 flex-1">
+                                <p class="font-medium">{{ example.title }}</p>
+                                <p class="truncate text-sm text-muted-foreground">{{ example.description }}</p>
+                            </div>
+                            <span class="text-muted-foreground" aria-hidden="true">→</span>
+                        </CardContent>
+                    </Card>
                 </Link>
             </li>
         </ul>

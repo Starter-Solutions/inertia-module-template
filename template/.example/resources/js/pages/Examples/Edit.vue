@@ -1,5 +1,10 @@
 <script setup lang="ts">
 import { Head, Link } from '@inertiajs/vue3'
+import { Button } from '@starter-solutions/vue-ui/base/button'
+import { Card, CardContent, CardFooter } from '@starter-solutions/vue-ui/base/card'
+import { Input } from '@starter-solutions/vue-ui/base/input'
+import { Label } from '@starter-solutions/vue-ui/base/label'
+import { Textarea } from '@starter-solutions/vue-ui/base/textarea'
 import ModuleShell from '../../components/ModuleShell.vue'
 import { useExample } from '../../composables/index'
 
@@ -17,24 +22,30 @@ const submit = () => {
     <Head :title="`Edit ${example?.title ?? 'example'}`" />
     <ModuleShell :title="`Edit ${example?.title ?? 'example'}`" description="Update this record through the module's controller endpoint.">
         <template #actions>
-            <Link v-if="example" :href="exampleApi.urls.show(example.id)" class="inertia-module-button">Cancel</Link>
+            <Button v-if="example" variant="outline" as-child>
+                <Link :href="exampleApi.urls.show(example.id)">Cancel</Link>
+            </Button>
         </template>
-        <form class="inertia-module-form" @submit.prevent="submit">
-            <label class="inertia-module-field">
-                <span>Title</span>
-                <input v-model="form.title" type="text" maxlength="255" autofocus />
-                <small v-if="form.errors.title" class="inertia-module-error">{{ form.errors.title }}</small>
-            </label>
-            <label class="inertia-module-field">
-                <span>Description</span>
-                <textarea v-model="form.description" rows="6"></textarea>
-                <small v-if="form.errors.description" class="inertia-module-error">{{ form.errors.description }}</small>
-            </label>
-            <div class="inertia-module-form-actions">
-                <button type="submit" class="inertia-module-button inertia-module-button-primary" :disabled="form.processing">
-                    {{ form.processing ? 'Saving…' : 'Save changes' }}
-                </button>
-            </div>
-        </form>
+        <Card>
+            <form @submit.prevent="submit">
+                <CardContent class="grid gap-6 pt-6">
+                    <div class="grid gap-2">
+                        <Label for="title">Title</Label>
+                        <Input id="title" v-model="form.title" maxlength="255" autofocus />
+                        <p v-if="form.errors.title" class="text-sm text-destructive">{{ form.errors.title }}</p>
+                    </div>
+                    <div class="grid gap-2">
+                        <Label for="description">Description</Label>
+                        <Textarea id="description" v-model="form.description" rows="6" />
+                        <p v-if="form.errors.description" class="text-sm text-destructive">{{ form.errors.description }}</p>
+                    </div>
+                </CardContent>
+                <CardFooter class="justify-end">
+                    <Button type="submit" :disabled="form.processing">
+                        {{ form.processing ? 'Saving…' : 'Save changes' }}
+                    </Button>
+                </CardFooter>
+            </form>
+        </Card>
     </ModuleShell>
 </template>

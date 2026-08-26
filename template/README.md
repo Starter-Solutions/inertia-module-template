@@ -96,12 +96,21 @@ import inertia from '@inertiajs/vite'
 import inertiaModules from '@starter-solutions/inertia-modules'
 
 export default defineConfig({
+    resolve: {
+        dedupe: ['vue', '@inertiajs/vue3'],
+    },
+    ssr: {
+        noExternal: ['@starter-solutions/vue-ui', 'reka-ui', '@lucide/vue'],
+    },
     plugins: [
         inertiaModules(),
         inertia(),
     ],
 })
 ```
+
+The SSR exceptions ensure that Vue UI's transitive Reka UI and Lucide
+components use the host application's Vue runtime.
 
 No changes are required in `app.ts`. The plugin discovers this package's
 `resources/js/inertia.js` entry, lazy-loads its pages directly from `vendor/`,
