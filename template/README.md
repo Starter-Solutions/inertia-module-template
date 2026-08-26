@@ -161,7 +161,9 @@ completes a missing npm publish, tag, or GitHub Release.
 The frontend package uses the open-source
 [`@starter-solutions/vue-ui`](https://www.npmjs.com/package/@starter-solutions/vue-ui)
 component library by default. Import components and composables directly from
-`@starter-solutions/vue-ui`; `ModuleShell` also loads the package's shared stylesheet.
+`@starter-solutions/vue-ui`. `ModuleShell` uses Tailwind CSS v4 utilities only;
+its stylesheet contains only the `@source` directives required for scanning the
+Composer sources and the built npm package.
 
 {{EXAMPLE_DOCUMENTATION}}
 

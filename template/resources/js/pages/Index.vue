@@ -27,8 +27,8 @@ const details = useDisclosure()
             <ThemeSwitch />
         </template>
 
-        <div class="inertia-module-empty">
-            <Card class="inertia-module-ui-card">
+        <div class="flex justify-center py-8 sm:py-16">
+            <Card class="w-full max-w-lg">
                 <CardHeader>
                     <CardTitle>Module ready</CardTitle>
                     <CardDescription>
@@ -37,9 +37,12 @@ const details = useDisclosure()
                     </CardDescription>
                 </CardHeader>
 
-                <CardContent v-if="details.isOpen.value">
-                    This page is loaded directly from the module package through
-                    the host application's Inertia resolver.
+                <CardContent
+                    v-if="details.isOpen.value"
+                    class="text-sm leading-6 text-muted-foreground"
+                >
+                    This page is loaded directly from the module package
+                    through the host application's Inertia resolver.
                 </CardContent>
 
                 <CardFooter>
