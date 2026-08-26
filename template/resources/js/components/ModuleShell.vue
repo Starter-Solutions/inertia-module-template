@@ -1,5 +1,4 @@
 <script setup>
-import '@starter-solutions/vue-ui/styles.css'
 import '../../css/module.css'
 
 defineProps({

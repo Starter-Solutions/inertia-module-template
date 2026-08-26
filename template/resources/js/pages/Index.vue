@@ -10,7 +10,7 @@ import {
 } from '@starter-solutions/vue-ui/base/card'
 import { Button } from '@starter-solutions/vue-ui/base/button'
 import { ThemeSwitch } from '@starter-solutions/vue-ui/custom/theme-switch'
-import { useDisclosure } from '@starter-solutions/vue-ui'
+import { useDisclosure } from '@starter-solutions/vue-ui/composables'
 import ModuleShell from '../components/ModuleShell.vue'
 
 const details = useDisclosure()
